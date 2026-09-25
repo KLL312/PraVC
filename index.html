@@ -1,0 +1,288 @@
+Aqui está um código HTML completo de uma galáxia romântica com explosões de partículas e mensagens bonitas. Salve como .html e abra no navegador:
+
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Para Você ✨</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #000;
+    font-family: 'Georgia', serif;
+    height: 100%;
+  }
+  canvas { display: block; }
+
+  #mensagem {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-size: 2em;
+    text-align: center;
+    text-shadow: 0 0 20px #ff69b4, 0 0 40px #ff1493;
+    opacity: 0;
+    transition: opacity 2s ease-in-out;
+    pointer-events: none;
+    padding: 20px;
+    max-width: 80%;
+    line-height: 1.4;
+  }
+
+  #inicio {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #ffb6c1;
+    font-size: 1.3em;
+    text-align: center;
+    cursor: pointer;
+    padding: 20px 40px;
+    border: 2px solid #ff69b4;
+    border-radius: 15px;
+    background: rgba(255, 105, 180, 0.1);
+    box-shadow: 0 0 30px #ff69b4;
+    transition: all 0.5s;
+    animation: pulsar 2s infinite;
+  }
+  #inicio:hover {
+    background: rgba(255, 105, 180, 0.3);
+    box-shadow: 0 0 50px #ff1493;
+  }
+  @keyframes pulsar {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.05); }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="galaxia"></canvas>
+<div id="mensagem"></div>
+<div id="inicio">💖 Clique aqui, meu amor 💖</div>
+
+<script>
+const canvas = document.getElementById('galaxia');
+const ctx = canvas.getContext('2d');
+let W, H;
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+// Estrelas de fundo
+const estrelas = [];
+for (let i = 0; i < 300; i++) {
+  estrelas.push({
+    x: Math.random() * W,
+    y: Math.random() * H,
+    r: Math.random() * 1.5,
+    a: Math.random(),
+    da: (Math.random() * 0.02) + 0.005
+  });
+}
+
+// Galáxia (espiral)
+const particulasGalaxia = [];
+const numParticulas = 1500;
+const centroX = () => W / 2;
+const centroY = () => H / 2;
+const braços = 3;
+
+for (let i = 0; i < numParticulas; i++) {
+  const t = Math.random() * 8; // distância
+  const braço = Math.floor(Math.random() * braços);
+  const anguloBase = (braço / braços) * Math.PI * 2;
+  const angulo = anguloBase + t * 0.7 + (Math.random() - 0.5) * 0.6;
+  const raio = t * 45 + Math.random() * 30;
+
+  const cores = ['#ff69b4', '#ff1493', '#ffb6c1', '#ffffff', '#c71585', '#ff77aa'];
+  particulasGalaxia.push({
+    angulo: angulo,
+    raio: raio,
+    tamanho: Math.random() * 2 + 0.5,
+    cor: cores[Math.floor(Math.random() * cores.length)],
+    brilho: Math.random(),
+    velRot: 0.0008 + Math.random() * 0.0005,
+    offset: Math.random() * Math.PI * 2,
+    pulso: Math.random() * 0.03 + 0.01
+  });
+}
+
+// Explosões (partículas soltas)
+const explosoes = [];
+
+function criarExplosao(x, y, corBase = null) {
+  const qtd = 80 + Math.floor(Math.random() * 60);
+  const cores = ['#ff69b4', '#ff1493', '#ffb6c1', '#ffffff', '#ffa6d5', '#ffd1e8'];
+  for (let i = 0; i < qtd; i++) {
+    const ang = Math.random() * Math.PI * 2;
+    const vel = Math.random() * 4 + 1;
+    explosoes.push({
+      x: x,
+      y: y,
+      vx: Math.cos(ang) * vel,
+      vy: Math.sin(ang) * vel,
+      vida: 1,
+      decai: 0.008 + Math.random() * 0.01,
+      tamanho: Math.random() * 2.5 + 1,
+      cor: corBase || cores[Math.floor(Math.random() * cores.length)]
+    });
+  }
+}
+
+// Mensagens românticas
+const mensagens = [
+  "Você é a estrela mais brilhante do meu universo 💫",
+  "Em cada partícula dessa galáxia, existe um pedacinho do que sinto por você 💖",
+  "Você é o meu caos favorito, meu brilho preferido ✨",
+  "Se eu pudesse, te daria todas as estrelas do céu 🌟",
+  "Meu coração explodiu em mil cores quando te vi 💥",
+  "Você é a poesia que o universo escreveu pra mim 🌌",
+  "Cada brilho aqui é um pensamento meu em você 💗",
+  "Você é a razão pela qual eu acredito em mágica 🪄",
+  "Entre bilhões de estrelas, eu escolhi você 🌹",
+  "Meu universo inteiro gira ao seu redor 💞"
+];
+
+let msgIndex = 0;
+const elementoMensagem = document.getElementById('mensagem');
+
+function mostrarMensagem() {
+  elementoMensagem.style.opacity = 0;
+  setTimeout(() => {
+    elementoMensagem.textContent = mensagens[msgIndex % mensagens.length];
+    elementoMensagem.style.opacity = 1;
+    msgIndex++;
+  }, 1000);
+}
+
+let tempo = 0;
+let iniciado = false;
+let timerExplosoes;
+
+function animar() {
+  // Rastro suave
+  ctx.fillStyle = 'rgba(0, 0, 5, 0.25)';
+  ctx.fillRect(0, 0, W, H);
+
+  // Estrelas de fundo piscando
+  estrelas.forEach(e => {
+    e.a += e.da;
+    if (e.a > 1 || e.a < 0) e.da *= -1;
+    ctx.beginPath();
+    ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255, 255, 255, ${e.a})`;
+    ctx.fill();
+  });
+
+  // Desenhar galáxia em espiral
+  const cx = centroX();
+  const cy = centroY();
+
+  // Núcleo brilhante
+  const gradiente = ctx.createRadialGradient(cx, cy, 0, cx, cy, 120);
+  gradiente.addColorStop(0, 'rgba(255, 182, 193, 0.9)');
+  gradiente.addColorStop(0.3, 'rgba(255, 105, 180, 0.5)');
+  gradiente.addColorStop(0.7, 'rgba(199, 21, 133, 0.2)');
+  gradiente.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = gradiente;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 120, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Partículas da galáxia
+  particulasGalaxia.forEach(p => {
+    p.angulo += p.velRot;
+    p.brilho += p.pulso;
+    const brilhoAtual = 0.5 + Math.sin(p.brilho) * 0.5;
+
+    const x = cx + Math.cos(p.angulo + p.offset) * p.raio;
+    const y = cy + Math.sin(p.angulo + p.offset) * p.raio * 0.5; // achatada (perspectiva)
+
+    ctx.beginPath();
+    ctx.arc(x, y, p.tamanho, 0, Math.PI * 2);
+    ctx.fillStyle = p.cor;
+    ctx.globalAlpha = brilhoAtual;
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = p.cor;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
+  });
+
+  // Atualizar explosões
+  for (let i = explosoes.length - 1; i >= 0; i--) {
+    const p = explosoes[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vx *= 0.98;
+    p.vy *= 0.98;
+    p.vida -= p.decai;
+
+    if (p.vida <= 0) {
+      explosoes.splice(i, 1);
+      continue;
+    }
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.tamanho * p.vida, 0, Math.PI * 2);
+    ctx.fillStyle = p.cor;
+    ctx.globalAlpha = p.vida;
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = p.cor;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
+  }
+
+  tempo++;
+  requestAnimationFrame(animar);
+}
+
+animar();
+
+// Iniciar experiência
+document.getElementById('inicio').addEventListener('click', () => {
+  if (iniciado) return;
+  iniciado = true;
+  document.getElementById('inicio').style.display = 'none';
+
+  // Primeira explosão no centro
+  setTimeout(() => {
+    criarExplosao(W / 2, H / 2);
+    mostrarMensagem();
+  }, 500);
+
+  // Explosões periódicas em posições aleatórias
+  timerExplosoes = setInterval(() => {
+    const x = Math.random() * W;
+    const y = Math.random() * H;
+    criarExplosao(x, y);
+  }, 1500);
+
+  // Trocar mensagens a cada 5 segundos
+  setInterval(mostrarMensagem, 5000);
+
+  // Explosão grande a cada 8 segundos
+  setInterval(() => {
+    criarExplosao(W / 2, H / 2);
+  }, 8000);
+});
+
+// Cliques criam explosões
+document.addEventListener('click', (e) => {
+  if (iniciado) criarExplosao(e.clientX, e.clientY);
+});
+</script>
+</body>
+</html>
